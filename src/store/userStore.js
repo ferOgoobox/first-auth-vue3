@@ -5,12 +5,13 @@ import { createUserWithEmailAndPassword,
          onAuthStateChanged } from 'firebase/auth'
 import { auth } from '../firebaseConfig'
 import router from '../router'
-
+import { useDatabaseStore } from './database'
 
 export const useUserStore = defineStore('userStore', {
     state: () => ({
         userData: null,
         loadingUser: false,
+        loadingSession: false
     }),
     getters: {
 
@@ -42,16 +43,20 @@ export const useUserStore = defineStore('userStore', {
             }
         },
         async signOutUser(){
+            this.loading = true
+            const databaseStore = useDatabaseStore()
+            databaseStore.$reset()
             try {
                 await signOut(auth)
                 this.userData = null
                 router.push('/login')
             } catch (error) {
                 console.log(error)
+            } finally {
+                this.loading = false
             }
         },
         async logoutUser(){
-
         },
         currentUse(){
             return new Promise((resolve, reject) => { 
@@ -62,6 +67,8 @@ export const useUserStore = defineStore('userStore', {
                             this.userData = { email: user.email, uid:user.uid }
                         }else{
                             this.userData = null
+                            const databaseStore = useDatabaseStore()
+                            databaseStore.$reset()
                         }
                         resolve(user)
                     }, (e) => reject(e)
