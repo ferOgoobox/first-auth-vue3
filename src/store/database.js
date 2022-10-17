@@ -55,7 +55,8 @@ export const useDatabaseStore = defineStore("database", {
                 })
 
             } catch (error) {
-                console.log(error)
+                console.log(error.code)
+                return error.code
             } finally {
                 this.loadingDoc = false
             }
@@ -77,14 +78,14 @@ export const useDatabaseStore = defineStore("database", {
                 this.documents = this.documents.filter(item => item.id !== id)
             
             } catch (error) {
-                console.log(error.message)
+                //console.log(error.message)
+                return error.message
             } finally {
                 this.loadingDoc = false
             }
         },
         async readUrl(id){
             this.loadingDoc = true
-            console.log('entra')
             try {
                 const docRef = doc(db, "urls", id)
                 const docSanp = await getDoc(docRef)
@@ -106,7 +107,6 @@ export const useDatabaseStore = defineStore("database", {
         },
         async updateUrl(id, name){
             this.loadingDoc = true
-            console.log('update')
             
             try {
                 const docRef = doc(db, "urls", id)
@@ -130,6 +130,7 @@ export const useDatabaseStore = defineStore("database", {
                 router.push('/')
             } catch (error) {
                 console.log(error.message)
+                return error.message
             } finally {
                 this.loadingDoc = false
             }
